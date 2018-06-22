@@ -1,5 +1,7 @@
 package com.fandhi.awantunai.biz;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -25,6 +27,14 @@ public class TransactionBiz {
 	
 	public void create(TransactionHistory transactionHistory) {
 		transactionHistoryService.create(transactionHistory);
+	}
+	
+	public List<TransactionHistory> getHistoryByAccountNo(String accountNo) {
+		return transactionHistoryService.findHistoryByAccountNo(accountNo);
+	}
+	
+	public List<TransactionHistory> getHistoryByAccountNoAndType(String accountNo, String type) {
+		return transactionHistoryService.findHistoryByAccountNoAndType(accountNo, type);
 	}
 	
 	public Long generateBalance(Long balance, String accountNo) {

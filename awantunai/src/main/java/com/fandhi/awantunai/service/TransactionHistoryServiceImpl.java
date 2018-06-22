@@ -37,7 +37,7 @@ public class TransactionHistoryServiceImpl implements TransactionHistoryService 
 	@SuppressWarnings("unchecked")
 	public List<TransactionHistory> findHistoryByAccountNo(String accountNo) {
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(TransactionHistory.class);
-		criteria.add(Restrictions.eq("accountNo", accountNo));
+		criteria.add(Restrictions.eq("accountNo1", accountNo));
 		criteria.addOrder(Order.desc("trxDate"));
 		return criteria.list();
 	}
@@ -45,7 +45,7 @@ public class TransactionHistoryServiceImpl implements TransactionHistoryService 
 	@SuppressWarnings("unchecked")
 	public List<TransactionHistory> findHistoryByAccountNoAndType(String accountNo, String type) {
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(TransactionHistory.class);
-		criteria.add(Restrictions.eq("accountNo", accountNo));
+		criteria.add(Restrictions.eq("accountNo1", accountNo));
 		criteria.add(Restrictions.eq("type", type));
 		criteria.addOrder(Order.desc("trxDate"));
 		return criteria.list();

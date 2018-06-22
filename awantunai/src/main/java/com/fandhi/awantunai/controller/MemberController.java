@@ -17,7 +17,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fandhi.awantunai.biz.MemberBiz;
 import com.fandhi.awantunai.biz.MessageBiz;
+import com.fandhi.awantunai.biz.TransactionBiz;
 import com.fandhi.awantunai.model.Member;
+import com.fandhi.awantunai.model.TransactionHistory;
 
 /**
  * 
@@ -35,6 +37,9 @@ public class MemberController {
 
 	@Autowired
 	private MessageBiz messageBiz;
+	
+	@Autowired
+	private TransactionBiz transactionBiz;
 	
 	@RequestMapping(value = "/register", method=RequestMethod.POST)
 	@ResponseBody
@@ -137,4 +142,99 @@ public class MemberController {
 		return resp;
 	}
 	
+	@RequestMapping(value = "/history", method=RequestMethod.GET)
+	@ResponseBody
+	public String history(
+			@RequestParam("accountNo") String accountNo,
+			@RequestParam("sign") String sign
+	) {
+
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("accountNo", accountNo);
+		map.put("sign", sign);
+		
+		// checking field & value		
+		List<Map<String, Object>> listError = messageBiz.errorMessage(map);
+		
+		String resp = "";
+		ObjectMapper om = new ObjectMapper();
+		Map<String, Object> response = new HashMap<String, Object>();
+				
+		if(!listError.isEmpty()) {
+			try {
+				response.put("errors", listError);
+				resp = om.writeValueAsString(response);
+			} catch (Exception e) {
+				logger.error("Error converting JSON");
+			}
+		} else {
+			try {
+				boolean isValidSign = messageBiz.isValidSign(accountNo, sign);
+				if(isValidSign) {
+					List<TransactionHistory> histories = transactionBiz.getHistoryByAccountNo(accountNo);
+					if(histories.isEmpty()) {
+						response.put("error", "No transaction history");												
+					} else {
+						response.put("result", "OK");
+						response.put("history", histories);						
+					}
+				} else {
+					response.put("error", "Invalid Sign");					
+				}
+				resp = om.writeValueAsString(response);
+			} catch (Exception e) {
+				logger.error("Error converting JSON : {}", e.getMessage());
+			}			
+		}
+		return resp;
+	}
+	
+	@RequestMapping(value = "/history", method=RequestMethod.POST)
+	@ResponseBody
+	public String history(
+			@RequestParam("accountNo") String accountNo,
+			@RequestParam("sign") String sign,
+			@RequestParam("type") String type		
+	) {
+
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("accountNo", accountNo);
+		map.put("sign", sign);
+		map.put("type", type);
+		
+		// checking field & value		
+		List<Map<String, Object>> listError = messageBiz.errorMessage(map);
+		
+		String resp = "";
+		ObjectMapper om = new ObjectMapper();
+		Map<String, Object> response = new HashMap<String, Object>();
+				
+		if(!listError.isEmpty()) {
+			try {
+				response.put("errors", listError);
+				resp = om.writeValueAsString(response);
+			} catch (Exception e) {
+				logger.error("Error converting JSON");
+			}
+		} else {
+			try {
+				boolean isValidSign = messageBiz.isValidSign(accountNo, sign);
+				if(isValidSign) {
+					List<TransactionHistory> histories = transactionBiz.getHistoryByAccountNoAndType(accountNo, type);
+					if(histories.isEmpty()) {
+						response.put("error", "No transaction history");												
+					} else {
+						response.put("result", "OK");
+						response.put("history", histories);						
+					}
+				} else {
+					response.put("error", "Invalid Sign");					
+				}
+				resp = om.writeValueAsString(response);
+			} catch (Exception e) {
+				logger.error("Error converting JSON : {}", e.getMessage());
+			}			
+		}
+		return resp;
+	}
 }

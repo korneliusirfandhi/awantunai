@@ -85,9 +85,11 @@ public class MessageBiz {
 
 	public boolean isValidSign(String accountNo, String sign) {
 		Member member = memberBiz.getMemberByAccountNo(accountNo);
-		String encrypt = encrypt(member.getPin() + sha256Encrypt(member.getAccountNo()));
-		if(encrypt.equals(sign)) {
-			return true;
+		if(member != null) {
+			String encrypt = encrypt(member.getPin() + sha256Encrypt(member.getAccountNo()));
+			if(encrypt.equals(sign)) {
+				return true;
+			}
 		}
 		return false;
 	}
